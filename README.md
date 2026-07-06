@@ -1,6 +1,6 @@
 # English Coach
 
-A teacher's notebook for non-native English speakers, living in a [herdr](https://herdr.dev) side pane.
+A teacher's notebook for non-native English speakers — any native language — living in a [herdr](https://herdr.dev) side pane.
 
 You work with your coding agent (Claude Code, Codex, ...) in English. Every time you make a mistake — grammar or dev jargon — the agent logs a color-coded correction to the board while it answers your actual question. The pane accumulates your personal correction history: a notebook written by your agent, about your English.
 
@@ -98,7 +98,7 @@ you type in English
               └─ claude -p --model haiku → ORIGINAL/FIXED/JARGON/WHY → add.sh → board
 ```
 
-Setup: see [`integrations/claude-code/english-coach-watchdog.sh`](integrations/claude-code/english-coach-watchdog.sh) — copy, chmod +x, register under `hooks.UserPromptSubmit` in `~/.claude/settings.json`, restart Claude Code. The stock language gate skips Brazilian Portuguese; adapt the regex for your native language.
+Setup: see [`integrations/claude-code/english-coach-watchdog.sh`](integrations/claude-code/english-coach-watchdog.sh) — copy, chmod +x, register under `hooks.UserPromptSubmit` in `~/.claude/settings.json`, restart Claude Code. The gate is language-agnostic: it only fires when the message plausibly is English, whatever your native language. Optionally set `ENGLISH_COACH_SKIP_REGEX` to a pattern for your native language to skip those messages before any API call.
 
 ### Option B — inline instruction (any agent)
 

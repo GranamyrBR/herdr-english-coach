@@ -20,14 +20,15 @@
 #   4. Restart Claude Code (hooks are snapshotted at session start).
 #
 # Config (env):
-#   ENGLISH_COACH_ADD  path to the plugin's add.sh
-#                      (default: ~/herdr-plugins/english-coach/add.sh,
-#                       falling back to the herdr-managed install dir)
-#   ENGLISH_COACH_LOG  corrections log (see add.sh)
-#
-# Note: the native-language gate below is tuned for Brazilian Portuguese
-# speakers (skips PT messages before any API call). Adapt the regex for
-# your own language.
+#   ENGLISH_COACH_ADD         path to the plugin's add.sh
+#                             (default: ~/herdr-plugins/english-coach/add.sh,
+#                              falling back to the herdr-managed install dir)
+#   ENGLISH_COACH_LOG         corrections log (see add.sh)
+#   ENGLISH_COACH_SKIP_REGEX  optional extended regex; prompts matching it
+#                             are skipped before any API call. Set it to a
+#                             pattern for your native language to save the
+#                             (already tiny) API cost on non-English messages,
+#                             e.g. for Portuguese: '[ãõç]|\b(que|não|para)\b'
 set -uo pipefail
 
 # recursion guard: never fire inside a nested claude spawned by this hook
@@ -59,12 +60,15 @@ PROMPT=$(jq -r '.prompt // empty' <<<"$INPUT" 2>/dev/null) || exit 0
 case "$PROMPT" in "/"*|"!"*) exit 0 ;; esac
 [ "${#PROMPT}" -lt 12 ] && exit 0
 
-# cheap native-language gate (Brazilian Portuguese) → skip without any API call
-if grep -qiE '[ãõçáéíóúâêôà]|\b(que|não|nao|para|você|voce|isso|essa|esse|está|esta|quando|como|coloque|deixe|veja|mande|escrevi|responda|fale|quero|preciso|ajude|em ingles)\b' <<<"$PROMPT"; then
+# optional user-supplied skip pattern (e.g. your native language) → skip free
+if [ -n "${ENGLISH_COACH_SKIP_REGEX:-}" ] && grep -qiE "$ENGLISH_COACH_SKIP_REGEX" <<<"$PROMPT"; then
   exit 0
 fi
-# must contain at least one common English function word
-grep -qiE '\b(the|is|are|to|it|i|you|a|an|can|do|does|how|what|this|that|check|make|run|want|wanna|for|not|but|all|my)\b' <<<"$PROMPT" || exit 0
+# language-agnostic gate: only proceed if the text plausibly IS English —
+# require at least two common English function words. Works regardless of
+# the user's native language (Portuguese, Spanish, Chinese, Russian, ...).
+EN_HITS=$(grep -oiE '\b(the|is|are|was|to|it|you|can|could|do|does|how|what|this|that|for|not|but|all|my|and|of|in|on|with|have|has|will|would|should)\b' <<<"$PROMPT" | wc -l)
+[ "$EN_HITS" -lt 2 ] && exit 0
 
 LOGDIR="${ENGLISH_COACH_LOG:+$(dirname "$ENGLISH_COACH_LOG")}"
 LOGDIR="${LOGDIR:-$HOME/.local/share/english-coach}"
