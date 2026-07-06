@@ -74,6 +74,35 @@ Arguments: `original` · `fixed` · `dev jargon` · `why` — each optional past
 | `[o]word[/]` | orange | correct, but devs do not say it this way |
 | `[g]word[/]` | green | the right jargon/form |
 
+## DevTOEFL — gamified scoring
+
+Every message scores points, positive-only (a TOEFL for devs, but bonuses instead of penalties):
+
+| Event | Points |
+|---|---|
+| Clean English message (no mistakes) | +10, plus a streak bonus of +2 × consecutive clean messages |
+| Coached message (you practiced) | +2 |
+
+Levels map CEFR bands to dev career ranks:
+
+| Points | Level |
+|---|---|
+| 0 | Intern (A1) |
+| 50 | Junior (A2) |
+| 150 | Mid (B1) |
+| 300 | Senior (B2) |
+| 600 | Staff (C1) |
+| 1000 | Principal (C2) |
+
+The scoreboard shows at the top of the board pane; each entry appends a score line; level-ups are announced. Check it anytime:
+
+```sh
+bash score.sh show     # 🏆 DevTOEFL  30 pts · Intern (A1) · streak 0 (best 1)
+bash score.sh reset    # start over
+```
+
+Clean-message detection needs the watchdog (Option A below) — it's what sees your mistake-free messages; agents only log mistakes.
+
 Clear the history:
 
 ```sh

@@ -38,5 +38,8 @@ why="${4:-}"
   [ -n "$fixed" ]    && printf '%sfixed:%s      %s\n' "$DIM" "$RESET" "$(colorize "$fixed")"
   [ -n "$jargon" ]   && printf '%sdev jargon:%s %s\n' "$DIM" "$RESET" "$(colorize "$jargon")"
   [ -n "$why" ]      && printf '%swhy:%s        %s\n' "$DIM" "$RESET" "$(colorize "$why")"
-  printf '\n'
 } >> "$LOG"
+
+# DevTOEFL: score the practice (best-effort)
+SCORE_SH="$(dirname "${BASH_SOURCE[0]}")/score.sh"
+[ -f "$SCORE_SH" ] && bash "$SCORE_SH" entry || printf '\n' >> "$LOG"

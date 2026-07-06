@@ -98,7 +98,12 @@ If the sentence has no genuine mistakes, respond with exactly: OK"
     -- "$COACH_PROMPT" 2>>"$LOGDIR/watchdog.log")
 
   FIRST=$(head -n1 <<<"$RESULT" | tr -d '[:space:]')
-  [ "$FIRST" = "OK" ] && exit 0
+  if [ "$FIRST" = "OK" ]; then
+    # DevTOEFL: clean English message → points + streak
+    SCORE_SH="$(dirname "$ADD_SH")/score.sh"
+    [ -f "$SCORE_SH" ] && bash "$SCORE_SH" clean
+    exit 0
+  fi
 
   original=$(grep -m1 '^ORIGINAL:' <<<"$RESULT" | sed 's/^ORIGINAL:[[:space:]]*//')
   fixed=$(grep -m1 '^FIXED:' <<<"$RESULT" | sed 's/^FIXED:[[:space:]]*//')

@@ -16,6 +16,9 @@ printf '%scyan%s   = missing word\n' "$CYAN" "$RESET"
 printf '%sred%s    = wrong word\n' "$RED" "$RESET"
 printf '%sorange%s = correct, but devs do not say it this way\n' "$ORANGE" "$RESET"
 printf '%sgreen%s  = the right jargon/form\n' "$GREEN" "$RESET"
+printf '%s%s%s\n' "$DIM" "───────────────────────────────────────────" "$RESET"
+SCORE_SH="$(dirname "${BASH_SOURCE[0]}")/score.sh"
+[ -f "$SCORE_SH" ] && bash "$SCORE_SH" show
 printf '%s%s%s\n\n' "$DIM" "───────────────────────────────────────────" "$RESET"
 
 exec tail -n 500 -f "$LOG"
