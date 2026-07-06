@@ -84,6 +84,24 @@ History persists in `~/.local/share/english-coach/corrections.log` (override wit
 
 ## Teaching your agent to use it
 
+Two ways, from cheapest to simplest:
+
+### Option A — watchdog hook (recommended: zero main-session tokens)
+
+Don't make your expensive main model (Opus/Fable) do the coaching. A Claude Code `UserPromptSubmit` hook pipes each of your English messages to a one-shot headless Haiku call (~$0.001/message) in the background; Haiku writes the correction to the board while your main session answers the actual question, unaware.
+
+```
+you type in English
+      ├──► main model answers your question (0 coaching tokens)
+      └──► hook (async, fail-open)
+              ├─ native-language gate: non-English → exit, $0
+              └─ claude -p --model haiku → ORIGINAL/FIXED/JARGON/WHY → add.sh → board
+```
+
+Setup: see [`integrations/claude-code/english-coach-watchdog.sh`](integrations/claude-code/english-coach-watchdog.sh) — copy, chmod +x, register under `hooks.UserPromptSubmit` in `~/.claude/settings.json`, restart Claude Code. The stock language gate skips Brazilian Portuguese; adapt the regex for your native language.
+
+### Option B — inline instruction (any agent)
+
 Add an instruction like this to your agent's memory/skill file (for Claude Code, a skill or `CLAUDE.md` entry):
 
 > When the user writes to you in English and makes a genuine grammar or dev-jargon mistake, answer their question first, then log a correction to the English Coach board:

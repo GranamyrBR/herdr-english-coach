@@ -1,6 +1,6 @@
 id = "granamyrbr.english-coach"
 name = "English Coach"
-version = "0.1.0"
+version = "0.2.0"
 min_herdr_version = "0.7.0"
 description = "A teacher's notebook for non-native English speakers: your coding agent logs color-coded English corrections (grammar + dev jargon) to a live side pane while you work."
 platforms = ["linux", "macos"]
